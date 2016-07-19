@@ -1,0 +1,41 @@
+/*
+ * controlWrapper.hpp
+ *
+ *  Created on: 04/07/2016
+ *      Author: rescue
+ */
+
+#ifndef COMP3431_STARTER_DEPTH_HPP_
+#define COMP3431_STARTER_DEPTH_HPP_
+
+#include <crosbot/handle.hpp>
+
+#include <ros/subscriber.h>
+#include <sensor_msgs/Image.h>
+
+namespace comp3431 {
+
+class DepthProcessing : public crosbot::HandledObject {
+public:
+    DepthProcessing();
+    virtual ~DepthProcessing();
+
+    void configure();
+    void startup();
+    void shutdown();
+
+    // Command callbacks
+    void callback_depth(const sensor_msgs::ImageConstPtr& depthMsg);
+
+private:
+    // Configuration
+    std::string depth_topic;
+
+    // ROS publishers/subscribers
+    ros::Subscriber depthSub;
+};
+typedef crosbot::Handle<DepthProcessing> DepthProcessingPtr;
+
+} // namespace comp3431
+
+#endif /* COMP3431_STARTER_DEPTH_HPP_ */
