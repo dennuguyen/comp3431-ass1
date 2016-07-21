@@ -10,7 +10,7 @@
 #include <comp3431_starter/wallFollow.hpp>
 
 #define BASE_FRAME  "base_link"
-#define MAX_SIDE_LIMIT      0.45
+#define MAX_SIDE_LIMIT      0.50
 #define MIN_APPROACH_DIST   0.30
 #define MAX_APPROACH_DIST   0.50
 
@@ -38,7 +38,14 @@ void WallFollower::startup() {
 }
 
 void WallFollower::shutdown() {
+    if (!paused) {
+        paused = true;
+        geometry_msgs::Twist t;
+        t.linear.x = t.linear.y = t.linear.z = 0;
+        t.angular.x = t.angular.y = t.angular.z = 0;
 
+        twistPub.publish(t);
+    }
 }
 
 void WallFollower::callbackScan(const sensor_msgs::LaserScanConstPtr& scan) {
@@ -77,7 +84,7 @@ void WallFollower::callbackScan(const sensor_msgs::LaserScanConstPtr& scan) {
         points[n] = point = transform * point;
 
         // Find max XS of a hit to the side of robot (abs(X) <= robot radius, Y > 0 left, Y < 0 right, abs(Y) <= limit)
-        if (fabs(point.x()) <= ROBOT_RADIUS && point.y() > 0 && fabs(point.y()) <= MAX_SIDE_LIMIT  && scan->ranges[n] <= MAX_SIDE_LIMIT) {
+        if (fabs(point.x()) <= ROBOT_RADIUS && fabs(point.y()) <= MAX_SIDE_LIMIT) {
             if ((side == LEFT && point.y() > 0) || (side == RIGHT && point.y() < 0)) {
                 // Point is beside the robot
                 if (point.x() > XMaxSide)
@@ -147,7 +154,7 @@ void WallFollower::callbackScan(const sensor_msgs::LaserScanConstPtr& scan) {
 }
 
 void WallFollower::callbackControl(const std_msgs::StringConstPtr& command) {
-    printf("Recieved %s message.\n", command->data.c_str());
+    ROS_INFO("Recieved %s message.\n", command->data.c_str());
     if (strcasecmp(command->data.c_str(), "start") == 0 ||
             strcasecmp(command->data.c_str(), "go") == 0 ||
             strcasecmp(command->data.c_str(), "begin") == 0 ||
