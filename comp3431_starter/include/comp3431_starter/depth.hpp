@@ -15,7 +15,7 @@
 
 namespace comp3431 {
 
-class DepthProcessing : public crosbot::HandledObject {
+class DepthProcessing {
 public:
     DepthProcessing();
     virtual ~DepthProcessing();
@@ -34,7 +34,6 @@ private:
     // ROS publishers/subscribers
     ros::Subscriber depthSub;
 };
-typedef crosbot::Handle<DepthProcessing> DepthProcessingPtr;
 
 } // namespace comp3431
 

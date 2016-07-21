@@ -23,9 +23,9 @@ int main_comp3431Depth(int argc, char** argv) {
     ros::NodeHandle nh("~");
 
     // Crosbot control wrapper
-    DepthProcessingPtr depth = new DepthProcessing();
-    depth->configure();
-    depth->startup();
+    DepthProcessing depth;
+    depth.configure();
+    depth.startup();
 
     while (ros::ok()) {
         ROS_INFO("%s Spinning", LOG_START);
@@ -34,7 +34,7 @@ int main_comp3431Depth(int argc, char** argv) {
     }
 
     // Disconnect
-    depth->shutdown();
+    depth.shutdown();
 
     return 0;
 }

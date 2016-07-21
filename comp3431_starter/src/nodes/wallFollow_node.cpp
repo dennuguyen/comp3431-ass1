@@ -23,9 +23,9 @@ int main_comp3431WallFollow(int argc, char** argv) {
     ros::NodeHandle nh("~");
 
     // Crosbot control wrapper
-    WallFollowerPtr follow = new WallFollower();
-    follow->configure();
-    follow->startup();
+    WallFollower follow;
+    follow.configure();
+    follow.startup();
 
     while (ros::ok()) {
         ROS_INFO("%s Spinning", LOG_START);
@@ -34,7 +34,7 @@ int main_comp3431WallFollow(int argc, char** argv) {
     }
 
     // Disconnect
-    follow->shutdown();
+    follow.shutdown();
 
     return 0;
 }

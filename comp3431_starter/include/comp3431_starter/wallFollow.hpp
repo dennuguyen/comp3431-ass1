@@ -22,7 +22,7 @@
 
 namespace comp3431 {
 
-class WallFollower : public crosbot::HandledObject {
+class WallFollower {
 private:
     bool paused, stopped;
 
@@ -44,7 +44,6 @@ public:
     void callbackScan(const sensor_msgs::LaserScanConstPtr& scan);
     void callbackControl(const std_msgs::StringConstPtr& command);
 };
-typedef crosbot::Handle<WallFollower> WallFollowerPtr;
 
 } // namespace comp3431
 
