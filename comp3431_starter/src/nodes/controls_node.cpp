@@ -22,7 +22,6 @@ int main_comp3431Controls(int argc, char** argv) {
     // Use without '~' when publish/subscribe/service
     ros::NodeHandle nh("~");
 
-    // Crosbot control wrapper
     ControlReceiverPtr controls = new ControlReceiver();
     controls->configure();
     controls->startup();

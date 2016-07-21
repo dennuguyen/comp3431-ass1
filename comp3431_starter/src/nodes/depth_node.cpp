@@ -22,7 +22,6 @@ int main_comp3431Depth(int argc, char** argv) {
     // Use without '~' when publish/subscribe/service
     ros::NodeHandle nh("~");
 
-    // Crosbot control wrapper
     DepthProcessing depth;
     depth.configure();
     depth.startup();

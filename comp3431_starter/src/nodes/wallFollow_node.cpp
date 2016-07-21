@@ -22,7 +22,6 @@ int main_comp3431WallFollow(int argc, char** argv) {
     // Use without '~' when publish/subscribe/service
     ros::NodeHandle nh("~");
 
-    // Crosbot control wrapper
     WallFollower follow;
     follow.configure();
     follow.startup();
