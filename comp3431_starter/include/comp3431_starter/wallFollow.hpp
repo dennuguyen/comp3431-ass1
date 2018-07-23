@@ -8,8 +8,6 @@
 #ifndef COMP3431_STARTER_WALLFOLLOW_HPP_
 #define COMP3431_STARTER_WALLFOLLOW_HPP_
 
-#include <crosbot/handle.hpp>
-
 #include <ros/publisher.h>
 #include <ros/subscriber.h>
 #include <sensor_msgs/LaserScan.h>

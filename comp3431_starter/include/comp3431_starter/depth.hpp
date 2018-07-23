@@ -8,8 +8,6 @@
 #ifndef COMP3431_STARTER_DEPTH_HPP_
 #define COMP3431_STARTER_DEPTH_HPP_
 
-#include <crosbot/handle.hpp>
-
 #include <ros/subscriber.h>
 #include <sensor_msgs/Image.h>
 
