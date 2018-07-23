@@ -6,8 +6,8 @@ find_package(catkin REQUIRED COMPONENTS
                     roscpp rviz
                     message_runtime std_msgs sensor_msgs geometry_msgs
                     image_transport
-                    crosbot_msgs
-                    crosbot
+                    #crosbot_msgs
+                    #crosbot
                     ## Uncomment these if required
                     #cv_bridge
                     #crosbot_explore
@@ -18,7 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
 #find_package(OpenCV)
 
 # QT4 required for RViz plugins
-find_package(Qt4 REQUIRED)
+#find_package(Qt4 REQUIRED)
 
 #######################################
 ## Declare ROS messages and services ##
@@ -69,31 +69,31 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 ADD_DEFINITIONS(-DQT_NO_KEYWORDS)
 
 ## Add generated MOC Qt header files
-file(GLOB_RECURSE QT_MOC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} include/comp3431_starter/rviz/**.hpp)
-QT4_WRAP_CPP(QT_MOC_HPP ${QT_MOC})
+#file(GLOB_RECURSE QT_MOC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} include/comp3431_starter/rviz/**.hpp)
+#QT4_WRAP_CPP(QT_MOC_HPP ${QT_MOC})
 
 ## Starter library with all common code
 add_library(comp3431_starter_library
     src/beacon.cpp
-    src/controlReceive.cpp
+    #src/controlReceive.cpp
     src/depth.cpp
     src/wallFollow.cpp
 )
 
 ## GUI Specific Libraries
-add_library(comp3431_starter_rviz_library
-    src/rviz/controlPanel.cpp
-    
-    ${QT_MOC_HPP}
-)
+#add_library(comp3431_starter_rviz_library
+#    src/rviz/controlPanel.cpp
+#
+#    ${QT_MOC_HPP}
+#)
 
 ## Declaring all Nodes
 add_executable(comp3431_starter_beacons
     src/nodes/beacon_node.cpp
 )
-add_executable(comp3431_starter_controls
-    src/nodes/controls_node.cpp
-)
+#add_executable(comp3431_starter_controls
+#    src/nodes/controls_node.cpp
+#)
 add_executable(comp3431_starter_depth
     src/nodes/depth_node.cpp
 )
@@ -121,17 +121,17 @@ target_link_libraries(comp3431_starter_wallfollow
   ${OpenCV_LIBRARIES}
   comp3431_starter_library
 )
-target_link_libraries(comp3431_starter_controls
-  ${catkin_LIBRARIES}
-  ${OpenCV_LIBRARIES}
-  comp3431_starter_library
-)
-target_link_libraries(comp3431_starter_rviz_library
-  ${catkin_LIBRARIES}
-  ${OpenCV_LIBRARIES}
-  ${QT_LIBRARIES}
-  comp3431_starter_library
-)
+#target_link_libraries(comp3431_starter_controls
+#  ${catkin_LIBRARIES}
+#  ${OpenCV_LIBRARIES}
+#  comp3431_starter_library
+#)
+#target_link_libraries(comp3431_starter_rviz_library
+#  ${catkin_LIBRARIES}
+#  ${OpenCV_LIBRARIES}
+#  ${QT_LIBRARIES}
+#  comp3431_starter_library
+#)
 
 #############
 ## Install ##
