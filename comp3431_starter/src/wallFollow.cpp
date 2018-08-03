@@ -34,7 +34,7 @@ void WallFollower::startup() {
     ros::NodeHandle nh;
     scanSub = nh.subscribe<sensor_msgs::LaserScan>("scan", 1, &WallFollower::callbackScan, this);
     commandSub = nh.subscribe<std_msgs::String>("cmd", 1, &WallFollower::callbackControl, this);
-    twistPub = nh.advertise< geometry_msgs::Twist >("cmd_vel_mux/input/navi", 1, false);
+    twistPub = nh.advertise< geometry_msgs::Twist >("cmd_vel", 1, false);
 }
 
 void WallFollower::shutdown() {
