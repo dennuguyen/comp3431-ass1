@@ -25,9 +25,9 @@ def send_goal_loop():
         command = raw_input()
 
         # Clean-ish exit
-        if c == '\n':
+        if command == '\n':
             break
-        elif c == '':
+        elif command == '':
             break
         else: 
             print "Sending command: " + command
