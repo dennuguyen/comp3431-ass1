@@ -1,6 +1,12 @@
 # Project 1: TurtleBot3 Mapping and Navigation
 
-A summary of the assignment specification.
+Assignment Specification:
+https://webcms3.cse.unsw.edu.au/COMP3431/20T3/resources/52289
+
+COMP3431 Course Repository:
+http://robolab.cse.unsw.edu.au:4443/comp3431-rsa/comp3431-rsa
+
+## Summary of Specifications
 
 ### Task
 
@@ -36,6 +42,6 @@ Mark penalties:
 - Robot collision with maze or markers.
 - Interfering with runs of other groups.
 
-### Git Maintenance
+## Git Maintenance
 
 To get changes from the official COMP3431 course repo: `git pull upstream master`
