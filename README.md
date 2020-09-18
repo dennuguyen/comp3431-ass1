@@ -1,9 +1,9 @@
 # Project 1: TurtleBot3 Mapping and Navigation
 
-Assignment Specification:\\
+Assignment Specification:\
 https://webcms3.cse.unsw.edu.au/COMP3431/20T3/resources/52289
 
-COMP3431 Course Repository:\\
+COMP3431 Course Repository:\
 http://robolab.cse.unsw.edu.au:4443/comp3431-rsa/comp3431-rsa
 
 ## Summary of Specifications
