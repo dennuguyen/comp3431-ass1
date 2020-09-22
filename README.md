@@ -46,6 +46,42 @@ Mark penalties:
 
 To get changes from the official COMP3431 course repo: `git pull upstream master`
 
+# WARNING
+Do not unplug before shutting down
+
+Run sudo shutdown now on the turtlebot before unplugging
+
+
+## CONNECTING TO THE TURTLEBOT
+
+1. Connect to the hidden network
+user : unsw_robotics
+pass : newSOUTHrobotics
+WPA2-Personal
+
+2. ssh ubuntu@<robot_name>
+pass : rsa2020
+
+3. Modify .bashrc on the turtlebot so ROS_MASTER_URI points to the
+remote PC and ROS_HOSTNAME points to localhost. Use ifconfig to find
+the IP addresses
+
+ROS_MASTER_URI=xxx.xxx.xxx.xxx
+ROS_HOSTNAME=xxx.xxx.xxx.xxx
+
+4. Source .bashrc and catkin_ws/devel/setup.bash on both the remote
+PC and the turtlebot
+
+5. Run roscore on the remote PC
+
+6. Run roslaunch turtlebot3_bringup turtlebot3_robot.launch on the
+turtlebot
+
+7. Run roslaunch turtlebot3_bringup turtlebot3_remote.launch on the
+remote PC
+
+8. Do stuff
+
 ### Sample Code
 ## Exploration - Josh and James
 -wallFollow code
