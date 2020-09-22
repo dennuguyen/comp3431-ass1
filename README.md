@@ -45,3 +45,27 @@ Mark penalties:
 ## Git Maintenance
 
 To get changes from the official COMP3431 course repo: `git pull upstream master`
+
+### Sample Code
+## Exploration - Josh and James
+wallFollow code:
+    Installation:
+    cd ~/catkin_ws/src
+    git clone http://robolab.cse.unsw.edu.au:4443/comp3431-rsa/comp3431-rsa.git
+    cd ~/catkin_ws
+    catkin_make
+    source ~/catkin_ws/devel/setup.bash
+    
+    Implementation - in Gazebo                      
+    source ~/catkin_ws/devel/setup.bash                 
+    roslaunch comp3431_starter wallFollow.launch                        # starting wallFollow
+    
+    source ~/catkin_ws/devel/setup.bash
+    roslaunch turtlebot3_gazebo turtlebot3_world.launch                 
+    
+    rostopic pub -1 /cmd std_msgs/String -- 'start'                     # telling wallFollow to run
+    
+    source ~/catkin_ws/devel/setup.bash
+    roslaunch turtlebot3_gazebo turtlebot3_gazebo_rviz.launch           # using rviz in Gazebo
+                                                                        # "rosrun rviz rviz" irl?
+
