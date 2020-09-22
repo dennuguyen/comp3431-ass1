@@ -48,7 +48,7 @@ To get changes from the official COMP3431 course repo: `git pull upstream master
 
 ### Sample Code
 ## Exploration - Josh and James
-wallFollow code:
+-wallFollow code
     Installation
     
     cd ~/catkin_ws/src
