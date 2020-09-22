@@ -49,7 +49,8 @@ To get changes from the official COMP3431 course repo: `git pull upstream master
 ### Sample Code
 ## Exploration - Josh and James
 wallFollow code:
-    Installation:
+    Installation
+    
     cd ~/catkin_ws/src
     git clone http://robolab.cse.unsw.edu.au:4443/comp3431-rsa/comp3431-rsa.git
     cd ~/catkin_ws
