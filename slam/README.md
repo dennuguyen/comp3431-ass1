@@ -1,16 +1,15 @@
 # SLAM
 
-## gmapping
+### gmapping
 
-### Building
-### Running
+roslaunch turtlebot3_slam turtlebo3_slam.launch slam_methods:=gmapping
 
-## hector
+### hector
 
-### Building
-### Running
+sudo apt-get install ros-melodic-hector-slam
+roslaunch turtlebot3_slam turtlebo3_slam.launch slam_methods:=hector
 
-## cartographer
+### cartographer
 
-### Building
-### Running
+sudo apt-get install ros-melodic-cartographer ros-melodic-cartographer-ros ros-melodic-cartographer-ros-msgs ros-melodic-cartographer-rviz
+roslaunch turtlebot3_slam turtlebo3_slam.launch slam_methods:=cartographer
