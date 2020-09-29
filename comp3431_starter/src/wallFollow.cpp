@@ -9,22 +9,21 @@
 
 #include <comp3431_starter/wallFollow.hpp>
 
-#define BASE_FRAME  "base_link"
-#define MAX_SIDE_LIMIT      0.50
-#define MIN_APPROACH_DIST   0.30
-#define MAX_APPROACH_DIST   0.50
+#define BASE_FRAME "base_link"
+#define MAX_SIDE_LIMIT 0.50
+#define MIN_APPROACH_DIST 0.30
+#define MAX_APPROACH_DIST 0.50
 
-#define ROBOT_RADIUS        0.20
+#define ROBOT_RADIUS 0.20
 
-#define MAX_SPEED       0.25
-#define MAX_TURN        1.0
+#define MAX_SPEED 0.25
+#define MAX_TURN 1.0
 
-#define CLIP_0_1(X)         ((X) < 0?0:(X)>1?1:(X))
+#define CLIP_0_1(X) ((X) < 0 ? 0 : (X) > 1 ? 1 : (X))
 
 namespace comp3431 {
 
-WallFollower::WallFollower() :
-    paused(true), stopped(false), side(LEFT) {
+WallFollower::WallFollower() : paused(true), stopped(false), side(LEFT) {
 }
 
 void WallFollower::configure() {
@@ -34,7 +33,8 @@ void WallFollower::startup() {
     ros::NodeHandle nh;
     scanSub = nh.subscribe<sensor_msgs::LaserScan>("scan", 1, &WallFollower::callbackScan, this);
     commandSub = nh.subscribe<std_msgs::String>("cmd", 1, &WallFollower::callbackControl, this);
-    twistPub = nh.advertise< geometry_msgs::Twist >("cmd_vel", 1, false);
+    slamSub = nh.subscribe<cartographer_ros_msgs::SubmapList>("submap_list", 1, &WallFollower::callbackSlam, this);
+    twistPub = nh.advertise<geometry_msgs::Twist>("cmd_vel", 1, false);
 }
 
 void WallFollower::shutdown() {
@@ -71,9 +71,8 @@ void WallFollower::callbackScan(const sensor_msgs::LaserScanConstPtr& scan) {
         return;
     }
 
-
     // Turn laser scan into a point cloud
-    std::vector< tf::Vector3 > points;
+    std::vector<tf::Vector3> points;
     points.resize(scan->ranges.size());
 
     float XMaxSide = -INFINITY, XMinFront = INFINITY, angle = scan->angle_min;
@@ -92,7 +91,6 @@ void WallFollower::callbackScan(const sensor_msgs::LaserScanConstPtr& scan) {
             }
         }
 
-
         // Find min XF of a hit in front of robot (X > 0, abs(Y) <= robot radius, X <= limit)
         if (point.x() > 0 && point.x() <= MAX_APPROACH_DIST && fabs(point.y()) <= ROBOT_RADIUS) {
             // Point is in front of the robot
@@ -100,7 +98,6 @@ void WallFollower::callbackScan(const sensor_msgs::LaserScanConstPtr& scan) {
                 XMinFront = point.x();
         }
     }
-
 
     ROS_DEBUG("Detected walls %.2f left, %.2f front\n", XMaxSide, XMinFront);
     float turn, drive;
@@ -156,18 +153,23 @@ void WallFollower::callbackScan(const sensor_msgs::LaserScanConstPtr& scan) {
 void WallFollower::callbackControl(const std_msgs::StringConstPtr& command) {
     ROS_INFO("Recieved %s message.\n", command->data.c_str());
     if (strcasecmp(command->data.c_str(), "start") == 0 ||
-            strcasecmp(command->data.c_str(), "go") == 0 ||
-            strcasecmp(command->data.c_str(), "begin") == 0 ||
-            strcasecmp(command->data.c_str(), "resume") == 0) {
+        strcasecmp(command->data.c_str(), "go") == 0 ||
+        strcasecmp(command->data.c_str(), "begin") == 0 ||
+        strcasecmp(command->data.c_str(), "resume") == 0) {
         paused = false;
     } else if (strcasecmp(command->data.c_str(), "stop") == 0 ||
-            strcasecmp(command->data.c_str(), "pause") == 0 ||
-            strcasecmp(command->data.c_str(), "halt") == 0) {
+               strcasecmp(command->data.c_str(), "pause") == 0 ||
+               strcasecmp(command->data.c_str(), "halt") == 0) {
         paused = true;
     } else if (strcasecmp(command->data.c_str(), "toggle") == 0) {
         paused = !paused;
     }
 }
 
-} // namespace comp3431
+void WallFollower::callbackSlam(const cartographer_ros_msgs::SubmapListConstPtr& submap) {
+}
 
+void WallFollower::~WallFollower(const std_msgs::Car) {
+}
+
+}  // namespace comp3431

@@ -8,12 +8,11 @@
 #ifndef COMP3431_STARTER_WALLFOLLOW_HPP_
 #define COMP3431_STARTER_WALLFOLLOW_HPP_
 
+#include <geometry_msgs/Twist.h>
 #include <ros/publisher.h>
 #include <ros/subscriber.h>
 #include <sensor_msgs/LaserScan.h>
-#include <geometry_msgs/Twist.h>
 #include <std_msgs/String.h>
-
 #include <tf/transform_listener.h>
 
 #include <sstream>
@@ -21,19 +20,21 @@
 namespace comp3431 {
 
 class WallFollower {
-private:
+   private:
     bool paused, stopped;
 
-    ros::Subscriber scanSub, commandSub;
+    ros::Subscriber scanSub, commandSub, slamSub;
     ros::Publisher twistPub;
     tf::TransformListener tfListener;
+    tf::TransformListener slamListener;
 
-    enum Side { LEFT, RIGHT };
+    enum Side { LEFT,
+                RIGHT };
     Side side;
 
-public:
+   public:
     WallFollower();
-    virtual ~WallFollower() {};
+    virtual ~WallFollower(){};
 
     void configure();
     void startup();
@@ -41,8 +42,9 @@ public:
 
     void callbackScan(const sensor_msgs::LaserScanConstPtr& scan);
     void callbackControl(const std_msgs::StringConstPtr& command);
+    void callbackSlam(const cartographer_ros_msgs::SubmapListConstPtr& submap);
 };
 
-} // namespace comp3431
+}  // namespace comp3431
 
 #endif /* COMP3431_STARTER_WALLFOLLOW_HPP_ */
