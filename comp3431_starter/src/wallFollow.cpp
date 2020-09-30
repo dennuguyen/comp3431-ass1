@@ -21,6 +21,13 @@
 
 #define CLIP_0_1(X) ((X) < 0 ? 0 : (X) > 1 ? 1 : (X))
 
+namespace {
+bool d_cmp(double a, double b, double eps) {
+    return std::abs(a - b) <= eps ||
+           std::abs(a - b) < (std::fmax(std::abs(a), std::abs(b)) * eps);
+}
+}  // namespace
+
 namespace comp3431 {
 
 WallFollower::WallFollower() : paused(true), stopped(false), side(LEFT) {
@@ -167,6 +174,10 @@ void WallFollower::callbackControl(const std_msgs::StringConstPtr& command) {
 }
 
 void WallFollower::callbackSlam(const cartographer_ros_msgs::SubmapListConstPtr& submap) {
+    if (d_cmp(submap[0]->pose.point.x, submap[end]->pose.point.x, __FLT_EPSILON__) &&
+        d_cmp(submap[0]->pose.point.y, submap[end]->pose.point.y, __FLT_EPSILON__) &&
+        d_cmp(submap[0]->pose.point.z, submap[end]->pose.point.z, __FLT_EPSILON__))
+        stopped = paused = true;
 }
 
 void WallFollower::~WallFollower(const std_msgs::Car) {
