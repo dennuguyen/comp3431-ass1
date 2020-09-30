@@ -21,13 +21,6 @@
 
 #define CLIP_0_1(X) ((X) < 0 ? 0 : (X) > 1 ? 1 : (X))
 
-namespace {
-bool d_cmp(double a, double b, double eps) {
-    return std::abs(a - b) <= eps ||
-           std::abs(a - b) < (std::fmax(std::abs(a), std::abs(b)) * eps);
-}
-}  // namespace
-
 namespace comp3431 {
 
 WallFollower::WallFollower() : paused(true), stopped(false), side(LEFT) {
@@ -74,7 +67,7 @@ void WallFollower::callbackScan(const sensor_msgs::LaserScanConstPtr& scan) {
         tfListener.waitForTransform(BASE_FRAME, scan->header.frame_id, scan->header.stamp, ros::Duration(2.0));
         tfListener.lookupTransform(BASE_FRAME, scan->header.frame_id, scan->header.stamp, transform);
     } catch (tf::TransformException& tfe) {
-        ROS_ERROR("Unable to get transformation.");
+        ROS_ERROR("Unable to get transformation (tfListener).");
         return;
     }
 
@@ -174,13 +167,19 @@ void WallFollower::callbackControl(const std_msgs::StringConstPtr& command) {
 }
 
 void WallFollower::callbackSlam(const cartographer_ros_msgs::SubmapListConstPtr& submap) {
-    if (d_cmp(submap[0]->pose.point.x, submap[end]->pose.point.x, __FLT_EPSILON__) &&
-        d_cmp(submap[0]->pose.point.y, submap[end]->pose.point.y, __FLT_EPSILON__) &&
-        d_cmp(submap[0]->pose.point.z, submap[end]->pose.point.z, __FLT_EPSILON__))
-        stopped = paused = true;
+    tf::StampedTransform transform;
+    try {
+        slamListener.waitForTransform(BASE_FRAME, submap->header.frame_id, submap->header.stamp, ros::Duration(2.0));
+        slamListener.lookupTransform(BASE_FRAME, submap->header.frame_id, submap->header.stamp, transform);
+    } catch (tf::TransformException& tfe) {
+        ROS_ERROR("Unable to get transformation (slamListener).");
+        return;
+    }
+    
+    if (MIN_HOME < transform.getOrigin().x() && transform.getOrigin().x() < MAX_HOME &&
+        MIN_HOME < transform.getOrigin().y() && transform.getOrigin().y() < MAX_HOME) {
+        std::cout << "HOME\n";
+        // paused = stopped = true;
+    }
 }
-
-void WallFollower::~WallFollower(const std_msgs::Car) {
-}
-
 }  // namespace comp3431
