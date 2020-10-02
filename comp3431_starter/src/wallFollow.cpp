@@ -14,7 +14,7 @@
 #define MIN_APPROACH_DIST 0.30
 #define MAX_APPROACH_DIST 0.50
 
-#define ROBOT_RADIUS 0.20
+#define ROBOT_RADIUS 0.2
 
 #define MAX_SPEED 0.25
 #define MAX_TURN 1.0
@@ -75,67 +75,52 @@ void WallFollower::callbackScan(const sensor_msgs::LaserScanConstPtr& scan) {
     std::vector<tf::Vector3> points;
     points.resize(scan->ranges.size());
 
-    float XMaxSide = -INFINITY, XMinFront = INFINITY, angle = scan->angle_min;
+    float XMaxLeft = -INFINITY, XMaxRight = INFINITY, XMinFront = INFINITY, angle = scan->angle_min;
     for (int n = 0; n < points.size(); ++n, angle += scan->angle_increment) {
         tf::Vector3 point(cos(angle) * scan->ranges[n], sin(angle) * scan->ranges[n], 0);
 
         // transfer point to base_link frame
         points[n] = point = transform * point;
 
-        // Find max XS of a hit to the side of robot (abs(X) <= robot radius, Y > 0 left, Y < 0 right, abs(Y) <= limit)
-        if (fabs(point.x()) <= ROBOT_RADIUS && fabs(point.y()) <= MAX_SIDE_LIMIT) {
-            if ((side == LEFT && point.y() > 0) || (side == RIGHT && point.y() < 0)) {
-                // Point is beside the robot
-                if (point.x() > XMaxSide)
-                    XMaxSide = point.x();
-            }
-        }
+        // Get the closest point on our right (aka y < 0)
+        if (point.y() < 0 && point.y() <= MAX_APPROACH_DIST && fabs(point.x()) <= ROBOT_RADIUS)
+            if (point.y() > XMaxRight)
+                XMaxRight = point.y();
 
-        // Find min XF of a hit in front of robot (X > 0, abs(Y) <= robot radius, X <= limit)
+        // Get the closest point on our left (aka y > 0)
+        if (point.y() > 0 && fabs(point.y()) <= MAX_APPROACH_DIST && fabs(point.x()) <= ROBOT_RADIUS)
+            if (point.y() < XMaxLeft)
+                XMaxLeft = point.y();
+
+        // Get the closest point in front of us
         if (point.x() > 0 && point.x() <= MAX_APPROACH_DIST && fabs(point.y()) <= ROBOT_RADIUS) {
-            // Point is in front of the robot
             if (point.x() < XMinFront)
                 XMinFront = point.x();
         }
+
+        std::cout << "L: " << XMaxLeft << "\t";
+        std::cout << "F: " << XMinFront << "\t";
+        std::cout << "R: " << XMaxRight << std::endl;
     }
 
-    ROS_DEBUG("Detected walls %.2f left, %.2f front\n", XMaxSide, XMinFront);
-    float turn, drive;
+    float turn = 0, drive = 0;
 
-    if (XMaxSide == -INFINITY) {
-        // No hits beside robot, so turn that direction
+    if (XMaxLeft > MAX_APPROACH_DIST) {
+        // no left wall, turn left
         turn = 1;
         drive = 0;
-    } else if (XMinFront <= MIN_APPROACH_DIST) {
-        // Blocked side and front, so turn other direction
+    } else if (XMaxRight < MAX_APPROACH_DIST) {
+        // no right wall, turn right
+        turn = -1;
+        drive = 0;
+    } else if (XMinFront < MIN_APPROACH_DIST) {
+        // wall in front, turn right
         turn = -1;
         drive = 0;
     } else {
-        // turn1 = (radius - XS) / 2*radius  // Clipped to range (0..1)
-        float turn1 = (ROBOT_RADIUS - XMaxSide) / (2 * ROBOT_RADIUS);
-        turn1 = CLIP_0_1(turn1);
-
-        // drive1 = (radius + XS) / 2*radius // Clipped to range (0..1)
-        float drive1 = (ROBOT_RADIUS + XMaxSide) / (2 * ROBOT_RADIUS);
-        drive1 = CLIP_0_1(drive1);
-
-        // drive2 = (XF - min) / (limit - min)  // Clipped to range (0..1)
-        float drive2 = (XMinFront - MIN_APPROACH_DIST) / (MAX_APPROACH_DIST - MIN_APPROACH_DIST);
-        drive2 = CLIP_0_1(drive2);
-
-        // turn2 = (limit - XF) / (limit - min) // Clipped to range (0..1)
-        float turn2 = (MAX_APPROACH_DIST - XMinFront) / (MAX_APPROACH_DIST - MIN_APPROACH_DIST);
-        turn2 = CLIP_0_1(turn2);
-
-        // turn = turn1 - turn2
-        turn = turn1 - turn2;
-
-        // drive = drive1 * drive2
-        drive = drive1 * drive2;
-    }
-
-    if (side == RIGHT) {
-        turn *= -1;
+        // go straight
+        turn = 0;
+        drive = 1;
     }
 
     // publish twist
@@ -144,8 +129,6 @@ void WallFollower::callbackScan(const sensor_msgs::LaserScanConstPtr& scan) {
     t.linear.x = drive * MAX_SPEED;
     t.angular.x = t.angular.y = 0;
     t.angular.z = turn * MAX_TURN;
-
-    ROS_DEBUG("Publishing velocities %.2f m/s, %.2f r/s\n", t.linear.x, t.angular.z);
     twistPub.publish(t);
     stopped = false;
 }
