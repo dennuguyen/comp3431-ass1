@@ -81,15 +81,14 @@ void WallFollower::callbackScan(const sensor_msgs::LaserScanConstPtr& scan) {
 
         // transfer point to base_link frame
         points[n] = point = transform * point;
-
         // Get the closest point on our right (aka y < 0)
-        if (point.y() < 0 && point.y() <= MAX_APPROACH_DIST && fabs(point.x()) <= ROBOT_RADIUS)
-            if (point.y() > XMaxRight)
+        if (point.y() < 0 && fabs(point.y()) <= MAX_APPROACH_DIST && fabs(point.x()) <= ROBOT_RADIUS)
+            if (point.y() < XMaxRight)
                 XMaxRight = point.y();
 
         // Get the closest point on our left (aka y > 0)
         if (point.y() > 0 && fabs(point.y()) <= MAX_APPROACH_DIST && fabs(point.x()) <= ROBOT_RADIUS)
-            if (point.y() < XMaxLeft)
+            if (point.y() > XMaxLeft)
                 XMaxLeft = point.y();
 
         // Get the closest point in front of us
@@ -102,14 +101,40 @@ void WallFollower::callbackScan(const sensor_msgs::LaserScanConstPtr& scan) {
         std::cout << "F: " << XMinFront << "\t";
         std::cout << "R: " << XMaxRight << std::endl;
     }
+    XMaxRight *= -1;
 
     float turn = 0, drive = 0;
+    
+    if (XMinFront < MAX_APPROACH_DIST) {
+    	drive = 0;
+	turn = 1;
+    } else {
+    	drive = 1;
+    	turn = XMaxLeft - XMaxRight;
+    }
 
+    /*
+    if (XMaxLeft > MAX_APPROACH_DIST && XMaxRight > MAX_APPROACH_DIST && XMinFront > MAX_APPROACH_DIST) {
+	turn = 0;
+    	drive = 1;
+    } else if (XMaxLeft > MAX_APPROACH_DIST && XMaxRight > MAX_APPROACH_DIST && XMinFront < MAX_APPROACH_DIST) {
+    	turn = 1;
+	drive = 0;
+    } else if (XMaxLeft > MAX_APPROACH_DIST && XMaxRight < MAX_APPROACH_DIST && XMinFront < MAX_APPROACH_DIST) {
+    	turn = 1;
+	drive = 0;
+    } else if (XMaxLeft < MAX_APPROACH_DIST && XMaxRight < MAX_APPROACH_DIST && XMinFront < MAX_APPROACH_DIST) {
+    	turn = 1;
+	drive = 0;
+    }
+    */
+
+    /*
     if (XMaxLeft > MAX_APPROACH_DIST) {
         // no left wall, turn left
         turn = 1;
         drive = 0;
-    } else if (XMaxRight < MAX_APPROACH_DIST) {
+    } else if (XMaxRight > MAX_APPROACH_DIST) {
         // no right wall, turn right
         turn = -1;
         drive = 0;
@@ -122,7 +147,7 @@ void WallFollower::callbackScan(const sensor_msgs::LaserScanConstPtr& scan) {
         turn = 0;
         drive = 1;
     }
-
+    */
     // publish twist
     geometry_msgs::Twist t;
     t.linear.y = t.linear.z = 0;
