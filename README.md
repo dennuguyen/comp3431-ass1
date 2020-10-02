@@ -82,27 +82,8 @@ remote PC
 
 8. Do stuff
 
-### Sample Code
-## Exploration - Josh and James
--wallFollow code
-    Installation
-    
-    cd ~/catkin_ws/src
-    git clone http://robolab.cse.unsw.edu.au:4443/comp3431-rsa/comp3431-rsa.git
-    cd ~/catkin_ws
-    catkin_make
-    source ~/catkin_ws/devel/setup.bash
-    
-    Implementation - in Gazebo                      
-    source ~/catkin_ws/devel/setup.bash                 
-    roslaunch comp3431_starter wallFollow.launch                        # starting wallFollow
-    
-    source ~/catkin_ws/devel/setup.bash
-    roslaunch turtlebot3_gazebo turtlebot3_world.launch                 
-    
-    rostopic pub -1 /cmd std_msgs/String -- 'start'                     # telling wallFollow to run
-    
-    source ~/catkin_ws/devel/setup.bash
-    roslaunch turtlebot3_gazebo turtlebot3_gazebo_rviz.launch           # using rviz in Gazebo
-                                                                        # "rosrun rviz rviz" irl?
-
+### Running Simulation
+`roslaunch turtlebot3_gazebo maze.world`\
+`roslaunch turtlebot3_slam turtlebot_slam.launch slam_methods:=cartographer`\
+`roslaunch comp3431_starter wallFollow.launch`\
+`rostopic pub -1 /cmd std_msgs/String -- 'start'`
