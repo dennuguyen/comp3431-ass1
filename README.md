@@ -83,7 +83,7 @@ remote PC
 8. Do stuff
 
 ### Running Simulation
-`roslaunch turtlebot3_gazebo maze.world`
-`roslaunch turtlebot3_slam turtlebot_slam.launch slam_methods:=cartographer`
-`roslaunch comp3431_starter wallFollow.launch`
+`roslaunch turtlebot3_gazebo maze.world`\
+`roslaunch turtlebot3_slam turtlebot_slam.launch slam_methods:=cartographer`\
+`roslaunch comp3431_starter wallFollow.launch`\
 `rostopic pub -1 /cmd std_msgs/String -- 'start'`
