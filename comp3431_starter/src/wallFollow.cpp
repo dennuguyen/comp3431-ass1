@@ -9,19 +9,19 @@
 
 #include <comp3431_starter/wallFollow.hpp>
 
-#define BASE_FRAME "base_link"
-#define MAX_SIDE_LIMIT 0.50
-#define MIN_APPROACH_DIST 0.30
-#define MAX_APPROACH_DIST 0.50
-
-#define ROBOT_RADIUS 0.2
-
-#define MAX_SPEED 0.25
-#define MAX_TURN 1.0
-
-#define CLIP_0_1(X) ((X) < 0 ? 0 : (X) > 1 ? 1 : (X))
+#define CLIP(X) ((X) < 0 ? 0 : (X) > 1 ? 1 : (X))
 
 namespace comp3431 {
+
+constexpr char BASE_FRAME[10] = "base_link";
+constexpr float MAX_SIDE_LIMIT = 0.50;
+constexpr float MIN_APPROACH_DIST = 0.30;
+constexpr float MAX_APPROACH_DIST = 0.50;
+constexpr float ROBOT_RADIUS = 0.2;
+constexpr float MAX_SPEED = 0.25;
+constexpr float MAX_TURN = 1.0;
+constexpr float MIN_HOME = -0.1;
+constexpr float MAX_HOME = 0.1;
 
 WallFollower::WallFollower() : paused(true), stopped(false), side(LEFT) {
 }
@@ -75,7 +75,7 @@ void WallFollower::callbackScan(const sensor_msgs::LaserScanConstPtr& scan) {
     std::vector<tf::Vector3> points;
     points.resize(scan->ranges.size());
 
-    float XMaxLeft = -INFINITY, XMaxRight = INFINITY, XMinFront = INFINITY, angle = scan->angle_min;
+    float left = -INFINITY, right = INFINITY, front = INFINITY, angle = scan->angle_min;
     for (int n = 0; n < points.size(); ++n, angle += scan->angle_increment) {
         tf::Vector3 point(cos(angle) * scan->ranges[n], sin(angle) * scan->ranges[n], 0);
 
@@ -83,71 +83,58 @@ void WallFollower::callbackScan(const sensor_msgs::LaserScanConstPtr& scan) {
         points[n] = point = transform * point;
         // Get the closest point on our right (aka y < 0)
         if (point.y() < 0 && fabs(point.y()) <= MAX_APPROACH_DIST && fabs(point.x()) <= ROBOT_RADIUS)
-            if (point.y() < XMaxRight)
-                XMaxRight = point.y();
+            if (point.y() < right)
+                right = point.y();
 
         // Get the closest point on our left (aka y > 0)
         if (point.y() > 0 && fabs(point.y()) <= MAX_APPROACH_DIST && fabs(point.x()) <= ROBOT_RADIUS)
-            if (point.y() > XMaxLeft)
-                XMaxLeft = point.y();
+            if (point.y() > left)
+                left = point.y();
 
         // Get the closest point in front of us
         if (point.x() > 0 && point.x() <= MAX_APPROACH_DIST && fabs(point.y()) <= ROBOT_RADIUS) {
-            if (point.x() < XMinFront)
-                XMinFront = point.x();
+            if (point.x() < front)
+                front = point.x();
         }
-
-        std::cout << "L: " << XMaxLeft << "\t";
-        std::cout << "F: " << XMinFront << "\t";
-        std::cout << "R: " << XMaxRight << std::endl;
     }
-    XMaxRight *= -1;
+    right *= -1; // make value positive
+
+    // debugging info
+    std::cout << "L: " << left << "\t";
+    std::cout << "F: " << front << "\t";
+    std::cout << "R: " << right << std::endl;
 
     float turn = 0, drive = 0;
-    
-    if (XMinFront < MAX_APPROACH_DIST) {
-    	drive = 0;
-	turn = 1;
-    } else {
-    	drive = 1;
-    	turn = XMaxLeft - XMaxRight;
-    }
 
-    /*
-    if (XMaxLeft > MAX_APPROACH_DIST && XMaxRight > MAX_APPROACH_DIST && XMinFront > MAX_APPROACH_DIST) {
-	turn = 0;
-    	drive = 1;
-    } else if (XMaxLeft > MAX_APPROACH_DIST && XMaxRight > MAX_APPROACH_DIST && XMinFront < MAX_APPROACH_DIST) {
-    	turn = 1;
-	drive = 0;
-    } else if (XMaxLeft > MAX_APPROACH_DIST && XMaxRight < MAX_APPROACH_DIST && XMinFront < MAX_APPROACH_DIST) {
-    	turn = 1;
-	drive = 0;
-    } else if (XMaxLeft < MAX_APPROACH_DIST && XMaxRight < MAX_APPROACH_DIST && XMinFront < MAX_APPROACH_DIST) {
-    	turn = 1;
-	drive = 0;
-    }
-    */
-
-    /*
-    if (XMaxLeft > MAX_APPROACH_DIST) {
-        // no left wall, turn left
+    if (left == -INFINITY) {
         turn = 1;
         drive = 0;
-    } else if (XMaxRight > MAX_APPROACH_DIST) {
-        // no right wall, turn right
-        turn = -1;
-        drive = 0;
-    } else if (XMinFront < MIN_APPROACH_DIST) {
-        // wall in front, turn right
-        turn = -1;
-        drive = 0;
+    } else if (front <= MIN_APPROACH_DIST) {
+        // if (left < right) {
+            turn = -1;
+            drive = 0;
+        // } else if (left > right) {
+            // turn = 1;
+            // drive = 0;
+        // }
     } else {
-        // go straight
-        turn = 0;
-        drive = 1;
+        // if (left < right) {
+            float turn1 = CLIP((ROBOT_RADIUS - left) / (2 * ROBOT_RADIUS));
+            float turn2 = CLIP((MAX_APPROACH_DIST - front) / (MAX_APPROACH_DIST - MIN_APPROACH_DIST));
+            float drive1 = CLIP((ROBOT_RADIUS + left) / (2 * ROBOT_RADIUS));
+            float drive2 = CLIP((front - MIN_APPROACH_DIST) / (MAX_APPROACH_DIST - MIN_APPROACH_DIST));
+            turn = turn1 - turn2;
+            drive = drive1 * drive2;
+        // } else if (left > right) {
+        //     float turn1 = CLIP((ROBOT_RADIUS - right) / (2 * ROBOT_RADIUS));
+        //     float turn2 = CLIP((MAX_APPROACH_DIST - front) / (MAX_APPROACH_DIST - MIN_APPROACH_DIST));
+        //     float drive1 = CLIP((ROBOT_RADIUS + right) / (2 * ROBOT_RADIUS));
+        //     float drive2 = CLIP((front - MIN_APPROACH_DIST) / (MAX_APPROACH_DIST - MIN_APPROACH_DIST));
+        //     turn = turn1 - turn2;
+        //     drive = drive1 * drive2;
+        // }
     }
-    */
+    
     // publish twist
     geometry_msgs::Twist t;
     t.linear.y = t.linear.z = 0;

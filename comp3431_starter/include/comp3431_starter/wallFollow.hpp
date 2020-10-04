@@ -21,9 +21,6 @@
 
 namespace comp3431 {
 
-constexpr float MIN_HOME = -0.1;
-constexpr float MAX_HOME = 0.1;
-
 class WallFollower {
    private:
     bool paused, stopped;
