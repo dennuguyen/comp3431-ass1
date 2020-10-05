@@ -8,8 +8,6 @@
 #ifndef COMP3431_STARTER_WALLFOLLOW_HPP_
 #define COMP3431_STARTER_WALLFOLLOW_HPP_
 
-#include <cartographer_ros_msgs/SubmapList.h>
-#include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Twist.h>
 #include <ros/publisher.h>
 #include <ros/subscriber.h>
@@ -27,7 +25,8 @@ class WallFollower {
 
     ros::Subscriber scanSub, commandSub, slamSub;
     ros::Publisher twistPub;
-    tf::TransformListener tfListener, slamListener;
+    tf::TransformListener tfListener;
+    tf::TransformListener slamListener;
 
     enum Side { LEFT,
                 RIGHT };
