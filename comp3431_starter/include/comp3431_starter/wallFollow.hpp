@@ -17,6 +17,7 @@
 #include <std_msgs/String.h>
 #include <tf/transform_listener.h>
 
+#include <chrono>
 #include <sstream>
 
 namespace comp3431 {
@@ -31,6 +32,7 @@ class WallFollower {
     ros::Subscriber scanSub, commandSub, slamSub;
     ros::Publisher twistPub;
     tf::TransformListener tfListener, slamListener;
+    std::chrono::time_point<std::chrono::system_clock> start;
 
     enum Side { LEFT,
                 RIGHT };

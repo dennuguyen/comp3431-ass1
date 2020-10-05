@@ -33,8 +33,9 @@ void WallFollower::startup() {
     ros::NodeHandle nh;
     scanSub = nh.subscribe<sensor_msgs::LaserScan>("scan", 1, &WallFollower::callbackScan, this);
     commandSub = nh.subscribe<std_msgs::String>("cmd", 1, &WallFollower::callbackControl, this);
-    slamSub = nh.subscribe<cartographer_ros_msgs::SubmapList>("submap_list", 1, &WallFollower::callbackSlam, this);
     twistPub = nh.advertise<geometry_msgs::Twist>("cmd_vel", 1, false);
+    slamSub = nh.subscribe<cartographer_ros_msgs::SubmapList>("submap_list", 1, &WallFollower::callbackSlam, this);
+    start = std::chrono::system_clock::now();
 }
 
 void WallFollower::shutdown() {
@@ -175,12 +176,14 @@ void WallFollower::callbackSlam(const cartographer_ros_msgs::SubmapListConstPtr&
         ROS_ERROR("Unable to get transformation (slamListener).");
         return;
     }
-    
-    if (MIN_HOME < transform.getOrigin().x() && transform.getOrigin().x() < MAX_HOME &&
-        MIN_HOME < transform.getOrigin().y() && transform.getOrigin().y() < MAX_HOME) {
-        std::cout << "HOME\n";
-        // paused = stopped = true;
-    }
+
+    std::chrono::duration<double> elapsed = std::chrono::system_clock::now() - start;
+    if (elapsed.count() > 10)
+        if (MIN_HOME < transform.getOrigin().x() && transform.getOrigin().x() < MAX_HOME &&
+            MIN_HOME < transform.getOrigin().y() && transform.getOrigin().y() < MAX_HOME) {
+            std::cout << "HOME\n";
+            // paused = stopped = true;
+        }
 }
 }  // namespace comp3431
 
