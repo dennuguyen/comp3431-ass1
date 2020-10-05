@@ -8,6 +8,8 @@
 #ifndef COMP3431_STARTER_WALLFOLLOW_HPP_
 #define COMP3431_STARTER_WALLFOLLOW_HPP_
 
+#include <cartographer_ros_msgs/SubmapList.h>
+#include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Twist.h>
 #include <ros/publisher.h>
 #include <ros/subscriber.h>
@@ -19,14 +21,16 @@
 
 namespace comp3431 {
 
+constexpr float MIN_HOME = -0.1;
+constexpr float MAX_HOME = 0.1;
+
 class WallFollower {
    private:
     bool paused, stopped;
 
     ros::Subscriber scanSub, commandSub, slamSub;
     ros::Publisher twistPub;
-    tf::TransformListener tfListener;
-    tf::TransformListener slamListener;
+    tf::TransformListener tfListener, slamListener;
 
     enum Side { LEFT,
                 RIGHT };
@@ -48,3 +52,4 @@ class WallFollower {
 }  // namespace comp3431
 
 #endif /* COMP3431_STARTER_WALLFOLLOW_HPP_ */
+
