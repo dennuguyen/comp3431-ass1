@@ -31,7 +31,7 @@ class WallFollower {
 
     ros::Subscriber scanSub, commandSub, slamSub;
     ros::Publisher twistPub;
-    tf::TransformListener tfListener, slamListener;
+    tf::TransformListener tfListener;
     std::chrono::time_point<std::chrono::system_clock> start;
 
     enum Side { LEFT,

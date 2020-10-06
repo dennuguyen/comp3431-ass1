@@ -34,7 +34,6 @@ void WallFollower::startup() {
     scanSub = nh.subscribe<sensor_msgs::LaserScan>("scan", 1, &WallFollower::callbackScan, this);
     commandSub = nh.subscribe<std_msgs::String>("cmd", 1, &WallFollower::callbackControl, this);
     twistPub = nh.advertise<geometry_msgs::Twist>("cmd_vel", 1, false);
-    slamSub = nh.subscribe<cartographer_ros_msgs::SubmapList>("submap_list", 1, &WallFollower::callbackSlam, this);
     start = std::chrono::system_clock::now();
 }
 
@@ -71,6 +70,24 @@ void WallFollower::callbackScan(const sensor_msgs::LaserScanConstPtr& scan) {
         ROS_ERROR("Unable to get transformation (tfListener).");
         return;
     }
+
+    // stop code
+    std::chrono::duration<double> elapsed = std::chrono::system_clock::now() - start;
+    if (elapsed.count() > 30)
+        if (MIN_HOME < transform.getOrigin().x() && transform.getOrigin().x() < MAX_HOME &&
+            MIN_HOME < transform.getOrigin().y() && transform.getOrigin().y() < MAX_HOME) {
+            
+            std::cout << "HOME\n";
+            
+            // publish twist
+            geometry_msgs::Twist t;
+            t.linear.x = t.linear.y = t.linear.z = 0;
+            t.angular.x = t.angular.y = t.angular.z = 0;
+            ROS_DEBUG("Publishing velocities %.2f m/s, %.2f r/s\n", t.linear.x, t.angular.z);
+            twistPub.publish(t);
+            paused = stopped = true;
+            return;
+        }
 
     // Turn laser scan into a point cloud
     std::vector<tf::Vector3> points;
@@ -165,32 +182,6 @@ void WallFollower::callbackControl(const std_msgs::StringConstPtr& command) {
     } else if (strcasecmp(command->data.c_str(), "toggle") == 0) {
         paused = !paused;
     }
-}
-
-void WallFollower::callbackSlam(const cartographer_ros_msgs::SubmapListConstPtr& submap) {
-    tf::StampedTransform transform;
-    try {
-        slamListener.waitForTransform(BASE_FRAME, submap->header.frame_id, submap->header.stamp, ros::Duration(2.0));
-        slamListener.lookupTransform(BASE_FRAME, submap->header.frame_id, submap->header.stamp, transform);
-    } catch (tf::TransformException& tfe) {
-        ROS_ERROR("Unable to get transformation (slamListener).");
-        return;
-    }
-
-    std::chrono::duration<double> elapsed = std::chrono::system_clock::now() - start;
-    if (elapsed.count() > 10)
-        if (MIN_HOME < transform.getOrigin().x() && transform.getOrigin().x() < MAX_HOME &&
-            MIN_HOME < transform.getOrigin().y() && transform.getOrigin().y() < MAX_HOME) {
-            std::cout << "HOME\n";
-            
-            // publish twist
-            geometry_msgs::Twist t;
-            t.linear.x = t.linear.y = t.linear.z = 0;
-            t.angular.x = t.angular.y = t.angular.z = 0;
-            ROS_DEBUG("Publishing velocities %.2f m/s, %.2f r/s\n", t.linear.x, t.angular.z);
-            twistPub.publish(t);
-            paused = stopped = true;
-        }
 }
 }  // namespace comp3431
 
