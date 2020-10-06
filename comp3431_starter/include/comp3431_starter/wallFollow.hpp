@@ -8,7 +8,7 @@
 #ifndef COMP3431_STARTER_WALLFOLLOW_HPP_
 #define COMP3431_STARTER_WALLFOLLOW_HPP_
 
-#include <cartographer_ros_msgs/SubmapList.h>
+#include <nav_msgs/Odometry.h>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Twist.h>
 #include <ros/publisher.h>
@@ -29,7 +29,7 @@ class WallFollower {
    private:
     bool paused, stopped;
 
-    ros::Subscriber scanSub, commandSub, slamSub;
+    ros::Subscriber scanSub, commandSub, slamSub, odomSub;
     ros::Publisher twistPub;
     tf::TransformListener tfListener;
     std::chrono::time_point<std::chrono::system_clock> start;
@@ -48,7 +48,7 @@ class WallFollower {
 
     void callbackScan(const sensor_msgs::LaserScanConstPtr& scan);
     void callbackControl(const std_msgs::StringConstPtr& command);
-    void callbackSlam(const cartographer_ros_msgs::SubmapListConstPtr& submap);
+    void callbackOdom(const nav_msgs::Odometry::OdometryConstPtr& odom);
 };
 
 }  // namespace comp3431
