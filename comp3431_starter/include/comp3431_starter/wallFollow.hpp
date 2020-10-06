@@ -48,7 +48,7 @@ class WallFollower {
 
     void callbackScan(const sensor_msgs::LaserScanConstPtr& scan);
     void callbackControl(const std_msgs::StringConstPtr& command);
-    void callbackOdom(const nav_msgs::Odometry::OdometryConstPtr& odom);
+    void callbackOdom(const nav_msgs::Odometry::ConstPtr& odom);
 };
 
 }  // namespace comp3431

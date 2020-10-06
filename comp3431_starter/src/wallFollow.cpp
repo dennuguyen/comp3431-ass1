@@ -167,21 +167,13 @@ void WallFollower::callbackControl(const std_msgs::StringConstPtr& command) {
     }
 }
 
-void WallFollower::callbackOdom(const nav_msgs::Odometry::OdometryConstPtr& odom) {
-    tf::StampedTransform transform;
-    try {
-        slamListener.waitForTransform(BASE_FRAME, odom->header.frame_id, odom->header.stamp, ros::Duration(2.0));
-        slamListener.lookupTransform(BASE_FRAME, odom->header.frame_id, odom->header.stamp, transform);
-    } catch (tf::TransformException& tfe) {
-        ROS_ERROR("Unable to get transformation (slamListener).");
-        return;
-    }
+void WallFollower::callbackOdom(const nav_msgs::Odometry::ConstPtr& odom) {
 
     // stop code
     std::chrono::duration<double> elapsed = std::chrono::system_clock::now() - start;
     if (elapsed.count() > 30)
-        if (MIN_HOME < transform.getOrigin().x() && transform.getOrigin().x() < MAX_HOME &&
-            MIN_HOME < transform.getOrigin().y() && transform.getOrigin().y() < MAX_HOME) {
+        if (MIN_HOME < odom->pose.pose.orientation.x && odom->pose.pose.orientation.x < MAX_HOME &&
+            MIN_HOME < odom->pose.pose.orientation.y && odom->pose.pose.orientation.y < MAX_HOME) {
             
             std::cout << "HOME\n";
             
