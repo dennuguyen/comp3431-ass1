@@ -172,8 +172,8 @@ void WallFollower::callbackOdom(const nav_msgs::Odometry::ConstPtr& odom) {
     // stop code
     std::chrono::duration<double> elapsed = std::chrono::system_clock::now() - start;
     if (elapsed.count() > 30)
-        if (MIN_HOME < odom->pose.pose.orientation.x && odom->pose.pose.orientation.x < MAX_HOME &&
-            MIN_HOME < odom->pose.pose.orientation.y && odom->pose.pose.orientation.y < MAX_HOME) {
+        if (MIN_HOME < odom->pose.pose.position.x && odom->pose.pose.position.x < MAX_HOME &&
+            MIN_HOME < odom->pose.pose.position.y && odom->pose.pose.position.y < MAX_HOME) {
             
             std::cout << "HOME\n";
             
