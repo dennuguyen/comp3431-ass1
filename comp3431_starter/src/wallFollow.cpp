@@ -167,7 +167,7 @@ void WallFollower::callbackControl(const std_msgs::StringConstPtr& command) {
     }
 }
 
-void callbackOdom(const nav_msgs::Odometry::OdometryConstPtr& odom) {
+void WallFollower::callbackOdom(const nav_msgs::Odometry::OdometryConstPtr& odom) {
     tf::StampedTransform transform;
     try {
         slamListener.waitForTransform(BASE_FRAME, odom->header.frame_id, odom->header.stamp, ros::Duration(2.0));
