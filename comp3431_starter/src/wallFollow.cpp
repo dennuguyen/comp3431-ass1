@@ -182,7 +182,14 @@ void WallFollower::callbackSlam(const cartographer_ros_msgs::SubmapListConstPtr&
         if (MIN_HOME < transform.getOrigin().x() && transform.getOrigin().x() < MAX_HOME &&
             MIN_HOME < transform.getOrigin().y() && transform.getOrigin().y() < MAX_HOME) {
             std::cout << "HOME\n";
-            // paused = stopped = true;
+            
+            // publish twist
+            geometry_msgs::Twist t;
+            t.linear.x = t.linear.y = t.linear.z = 0;
+            t.angular.x = t.angular.y = t.angular.z = 0;
+            ROS_DEBUG("Publishing velocities %.2f m/s, %.2f r/s\n", t.linear.x, t.angular.z);
+            twistPub.publish(t);
+            paused = stopped = true;
         }
 }
 }  // namespace comp3431
