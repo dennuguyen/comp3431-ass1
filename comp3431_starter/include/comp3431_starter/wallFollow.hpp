@@ -22,8 +22,8 @@
 
 namespace comp3431 {
 
-constexpr float MIN_HOME = -0.1;
-constexpr float MAX_HOME = 0.1;
+constexpr float MIN_HOME = -0.6;
+constexpr float MAX_HOME = 0.6;
 
 class WallFollower {
    private:
