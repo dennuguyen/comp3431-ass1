@@ -1,0 +1,13 @@
+\contentsline {section}{\numberline {1}Tasks}{1}
+\contentsline {section}{\numberline {2}ROS Packages}{1}
+\contentsline {subsection}{\numberline {2.1}Mapping}{1}
+\contentsline {subsection}{\numberline {2.2}Exploration}{2}
+\contentsline {subsection}{\numberline {2.3}Waypoint Navigation}{3}
+\contentsline {subsection}{\numberline {2.4}Vision Processing}{4}
+\contentsline {section}{\numberline {3}Evaluation \& Limitations}{4}
+\contentsline {section}{\numberline {4}Contribution}{5}
+\contentsline {section}{Appendices}{6}
+\contentsline {section}{\numberline {A}SLAM Instructions}{6}
+\contentsline {section}{\numberline {B}Exploration Instructions}{6}
+\contentsline {section}{\numberline {C}Wall Follower Algorithm}{7}
+\contentsline {section}{\numberline {D}Homing Algorithm}{7}
